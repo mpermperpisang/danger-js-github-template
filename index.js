@@ -1,10 +1,60 @@
-const _ = require( './general' );
-const { warnings, failures } = require( './message' );
+// Github
+const { git, github } = danger;
+const {
+  modified_files,
+} = git;
+const {
+  pr, thisPR, api, issue,
+} = github;
+const { issues } = api;
+const {
+  body, title, changed_files, user, additions, deletions, assignees,
+} = pr;
+const { owner, repo, number } = thisPR;
+
+// Details
+const titleUpper = title.toUpperCase();
+const isWIP = titleUpper.includes(labels.wip.toString().toUpperCase());
+const lastCommit = danger.git.commits[danger.git.commits.length - 1].message;
+const details = {
+  exclude: [
+    'package-lock.json',
+    'dangerfile.js',
+  ],
+  max: {
+    changedFiles: 25,
+    changedCodes: 500,
+  },
+  min: {
+    desc: 100,
+  },
+};
+const regex = {
+  shortTitle: /\][ a-zA-Z0-9]{5,50}/,
+  commitPrefix: /^(feat:)|(fix:)|(docs:)|(test:)/g,
+};
+const labels = {
+  wip: ['wip'],
+  working_in_progress: ['working in progress'],
+};
+
+const warnings = {
+  minDesc: 'Please add more detail in description.',
+  wip: 'PR is classified as Working in Progress',
+  lastCommit: 'Please check last commit message format.',
+};
+
+const failures = {
+  tooShortTitle: 'Please add more words on PR title.',
+  noLabel: 'Please add more tags on PR label.',
+  excludeFilesChanged: `Please DO NOT change ${details.exclude.join(' or ')}`,
+  tooMuchChanges: 'Big PR. Please break the PR changes.',
+};
 
 // Function declaration and calling
 function checkPRChanges() {
-  const hasTooMuchFilesChanged = _.changed_files > _.details.max.changedFiles;
-  const hasTooMuchCodesChanged = _.additions + _.deletions > _.details.max.changedCodes;
+  const hasTooMuchFilesChanged = changed_files > details.max.changedFiles;
+  const hasTooMuchCodesChanged = additions + deletions > details.max.changedCodes;
 
   if (hasTooMuchFilesChanged || hasTooMuchCodesChanged) {
     fail(failures.tooMuchChanges());
@@ -13,52 +63,52 @@ function checkPRChanges() {
 
 module.exports = {
   prTitle() { // Force author to follow title rule
-    const isTitleSHort = _.title.match(_.regex.shortTitle);
+    const isTitleSHort = title.match(regex.shortTitle);
 
-    if (_.isWIP) warn(warnings.wip);
+    if (isWIP) warn(warnings.wip);
     if (!isTitleSHort) fail(failures.tooShortTitle);
   },
   prDesc() { // Force author to follow description rule
-    const hasMinDesc = _.body.length < _.details.min.desc;
+    const hasMinDesc = body.length < details.min.desc;
 
     if (hasMinDesc) {
       warn(warnings.minDesc);
     }
   },
   prAssignees() { // Force author to assign assignee
-    const isEmptyAssignee = _.assignees.length === 0;
+    const isEmptyAssignee = assignees.length === 0;
     const payload = {
-      owner: _.owner, repo: _.repo, issue_number: _.number, assignees: _.user.login,
+      owner: owner, repo: repo, issue_number: number, assignees: user.login,
     };
 
-    if (isEmptyAssignee) _.issues.addAssignees(payload);
+    if (isEmptyAssignee) issues.addAssignees(payload);
   },
   prLabels() { // Force author to add label
-    const isEmptyLabel = (_.isWIP && _.issue.labels.length === 1)
-                          || (!_.isWIP && _.issue.labels.length === 0);
+    const isEmptyLabel = (isWIP && issue.labels.length === 1)
+                          || (!isWIP && issue.labels.length === 0);
     const payloadLabelAdd = {
-      owner: _.owner, repo: _.repo, issue_number: _.number, labels: _.labels.working_in_progress,
+      owner: owner, repo: repo, issue_number: number, labels: labels.working_in_progress,
     };
-    const payloadLabelList = { owner: _.owner, repo: _.repo, issue_number: _.number };
+    const payloadLabelList = { owner: owner, repo: repo, issue_number: number };
     const payloadLabelRemove = {
-      owner: _.owner, repo: _.repo, issue_number: _.number, name: _.labels.working_in_progress,
+      owner: owner, repo: repo, issue_number: number, name: labels.working_in_progress,
     };
 
     if (isEmptyLabel) fail(failures.noLabel);
-    if (_.isWIP) {
-      _.issues.addLabels(payloadLabelAdd);
+    if (isWIP) {
+      issues.addLabels(payloadLabelAdd);
     } else {
-      _.issues.listLabelsOnIssue(payloadLabelList).then((response) => {
+      issues.listLabelsOnIssue(payloadLabelList).then((response) => {
         response.data.forEach((arr) => {
-          if (JSON.stringify(arr.name).includes(_.labels.working_in_progress)) {
-            _.issues.removeLabel(payloadLabelRemove);
+          if (JSON.stringify(arr.name).includes(labels.working_in_progress)) {
+            issues.removeLabel(payloadLabelRemove);
           }
         });
       });
     }
   },
   prChangesCount() { // Force author to create small changes
-    const isFileModified = _.details.exclude.filter((e) => _.modified_files.includes(e)).length > 0;
+    const isFileModified = details.exclude.filter((e) => modified_files.includes(e)).length > 0;
 
     if (isFileModified) {
       fail(failures.excludeFilesChanged);
@@ -67,6 +117,6 @@ module.exports = {
     }
   },
   prCommits() { // Force author to follow commit message format
-    if (!_.lastCommit.match(_.regex.commitPrefix)) warn(warnings.lastCommit(_.lastCommit));
+    if (!lastCommit.match(regex.commitPrefix)) warn(warnings.lastCommit(lastCommit));
   },
 }
