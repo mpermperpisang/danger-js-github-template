@@ -37,11 +37,11 @@ module.exports = {
     const isEmptyLabel = (_.isWIP && _.issue.labels.length === 1)
                           || (!_.isWIP && _.issue.labels.length === 0);
     const payloadLabelAdd = {
-      owner: _.owner, repo: _.repo, issue_number: _.number, labels: labels.working_in_progress,
+      owner: _.owner, repo: _.repo, issue_number: _.number, labels: _.labels.working_in_progress,
     };
     const payloadLabelList = { owner: _.owner, repo: _.repo, issue_number: _.number };
     const payloadLabelRemove = {
-      owner: _.owner, repo: _.repo, issue_number: _.number, name: labels.working_in_progress,
+      owner: _.owner, repo: _.repo, issue_number: _.number, name: _.labels.working_in_progress,
     };
 
     if (isEmptyLabel) fail(failures.noLabel);
@@ -67,6 +67,6 @@ module.exports = {
     }
   },
   prCommits() { // Force author to follow commit message format
-    if (!lastCommit.match(_.regex.commitPrefix)) warn(warnings.lastCommit(_.lastCommit));
+    if (!_.lastCommit.match(_.regex.commitPrefix)) warn(warnings.lastCommit(_.lastCommit));
   },
 }
