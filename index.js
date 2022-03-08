@@ -1,10 +1,10 @@
 const _ = require( './general' );
-const { failures } = require( './message' );
+const { warnings, failures } = require( './message' );
 
 // Function declaration and calling
 function checkPRChanges() {
-  const hasTooMuchFilesChanged = _.changed_files > details.max.changedFiles;
-  const hasTooMuchCodesChanged = _.additions + _.deletions > details.max.changedCodes;
+  const hasTooMuchFilesChanged = _.changed_files > _.details.max.changedFiles;
+  const hasTooMuchCodesChanged = _.additions + _.deletions > _.details.max.changedCodes;
 
   if (hasTooMuchFilesChanged || hasTooMuchCodesChanged) {
     fail(failures.tooMuchChanges());
@@ -13,13 +13,13 @@ function checkPRChanges() {
 
 module.exports = {
   prTitle() { // Force author to follow title rule
-    const isTitleSHort = _.title.match(regex.shortTitle);
+    const isTitleSHort = _.title.match(_.regex.shortTitle);
 
-    if (isWIP) warn(warnings.wip);
+    if (_.isWIP) warn(warnings.wip);
     if (!isTitleSHort) fail(failures.tooShortTitle);
   },
   prDesc() { // Force author to follow description rule
-    const hasMinDesc = _.body.length < details.min.desc;
+    const hasMinDesc = _.body.length < _.details.min.desc;
 
     if (hasMinDesc) {
       warn(warnings.minDesc);
@@ -34,8 +34,8 @@ module.exports = {
     if (isEmptyAssignee) _.issues.addAssignees(payload);
   },
   prLabels() { // Force author to add label
-    const isEmptyLabel = (isWIP && _.issue.labels.length === 1)
-                          || (!isWIP && _.issue.labels.length === 0);
+    const isEmptyLabel = (_.isWIP && _.issue.labels.length === 1)
+                          || (!_.isWIP && _.issue.labels.length === 0);
     const payloadLabelAdd = {
       owner: _.owner, repo: _.repo, issue_number: _.number, labels: labels.working_in_progress,
     };
@@ -45,7 +45,7 @@ module.exports = {
     };
 
     if (isEmptyLabel) fail(failures.noLabel);
-    if (isWIP) {
+    if (_.isWIP) {
       _.issues.addLabels(payloadLabelAdd);
     } else {
       _.issues.listLabelsOnIssue(payloadLabelList).then((response) => {
@@ -58,7 +58,7 @@ module.exports = {
     }
   },
   prChangesCount() { // Force author to create small changes
-    const isFileModified = details.exclude.filter((e) => _.modified_files.includes(e)).length > 0;
+    const isFileModified = _.details.exclude.filter((e) => _.modified_files.includes(e)).length > 0;
 
     if (isFileModified) {
       fail(failures.excludeFilesChanged);
