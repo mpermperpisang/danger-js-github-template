@@ -8,7 +8,7 @@ const {
 } = github;
 const { issues } = api;
 const {
-  body, title, changed_files, user, additions, deletions, assignees,
+  body, title, changed_files, user, assignees,
 } = pr;
 const { owner, repo, number } = thisPR;
 
@@ -23,11 +23,11 @@ const details = {
     changedCodes: 500,
   },
   min: {
-    desc: 100,
+    desc: 25,
   },
 };
 const regex = {
-  shortTitle: /\][ a-zA-Z0-9]{5,25}/,
+  shortTitle: /[ a-zA-Z0-9:]{5,50}/,
   commitPrefix: /^(feat:)|(fix:)|(docs:)|(test:)/g,
 };
 const labels = {
