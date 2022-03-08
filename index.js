@@ -57,7 +57,7 @@ function checkPRChanges() {
   const hasTooMuchCodesChanged = additions + deletions > details.max.changedCodes;
 
   if (hasTooMuchFilesChanged || hasTooMuchCodesChanged) {
-    fail(failures.tooMuchChanges());
+    fail(failures.tooMuchChanges);
   }
 }
 
