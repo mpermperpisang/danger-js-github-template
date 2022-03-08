@@ -1,6 +1,6 @@
 const titleUpper = title.toUpperCase();
-export const isWIP = titleUpper.includes(labels.wip.toString().toUpperCase());
-export const details = {
+const isWIP = titleUpper.includes(labels.wip.toString().toUpperCase());
+const details = {
   exclude: [
     'package-lock.json',
     'dangerfile.js',
@@ -13,8 +13,11 @@ export const details = {
     desc: 100,
   },
 };
-
-export const regex = {
+const regex = {
   shortTitle: /\][ a-zA-Z0-9]{5,50}/,
   commitPrefix: /^(feat:)|(fix:)|(docs:)|(test:)/g,
 };
+
+module.exports = {
+  isWIP, details, regex
+}
