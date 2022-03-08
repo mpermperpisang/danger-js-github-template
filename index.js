@@ -27,7 +27,7 @@ const details = {
   },
 };
 const regex = {
-  shortTitle: /\][ a-zA-Z0-9]{5,50}/,
+  shortTitle: /\][ a-zA-Z0-9]{5,25}/,
   commitPrefix: /^(feat:)|(fix:)|(docs:)|(test:)/g,
 };
 const labels = {
@@ -54,9 +54,8 @@ const failures = {
 // Function declaration and calling
 function checkPRChanges() {
   const hasTooMuchFilesChanged = changed_files > details.max.changedFiles;
-  const hasTooMuchCodesChanged = additions + deletions > details.max.changedCodes;
 
-  if (hasTooMuchFilesChanged || hasTooMuchCodesChanged) {
+  if (hasTooMuchFilesChanged) {
     fail(failures.tooMuchChanges);
   }
 }
@@ -94,7 +93,6 @@ module.exports = {
       owner: owner, repo: repo, issue_number: number, name: labels.working_in_progress,
     };
 
-    if (isEmptyLabel) fail(failures.noLabel);
     if (isWIP) {
       issues.addLabels(payloadLabelAdd);
     } else {
@@ -106,6 +104,7 @@ module.exports = {
         });
       });
     }
+    if (isEmptyLabel) fail(failures.noLabel);
   },
   prChangesCount() { // Force author to create small changes
     const isFileModified = details.exclude.filter((e) => modified_files.includes(e)).length > 0;
