@@ -13,9 +13,6 @@ const {
 const { owner, repo, number } = thisPR;
 
 // Details
-const titleUpper = title.toUpperCase();
-const isWIP = titleUpper.includes(labels.wip.toString().toUpperCase());
-const lastCommit = danger.git.commits[danger.git.commits.length - 1].message;
 const details = {
   exclude: [
     'package-lock.json',
@@ -37,6 +34,9 @@ const labels = {
   wip: ['wip'],
   working_in_progress: ['working in progress'],
 };
+const titleUpper = title.toUpperCase();
+const isWIP = titleUpper.includes(labels.wip.toString().toUpperCase());
+const lastCommit = danger.git.commits[danger.git.commits.length - 1].message;
 
 const warnings = {
   minDesc: 'Please add more detail in description.',
