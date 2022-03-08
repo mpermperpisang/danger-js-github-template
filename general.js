@@ -17,6 +17,7 @@ const { owner, repo, number } = thisPR;
 // Details
 const titleUpper = title.toUpperCase();
 const isWIP = titleUpper.includes(labels.wip.toString().toUpperCase());
+const lastCommit = danger.git.commits[danger.git.commits.length - 1].message;
 const details = {
   exclude: [
     'package-lock.json',
@@ -34,6 +35,10 @@ const regex = {
   shortTitle: /\][ a-zA-Z0-9]{5,50}/,
   commitPrefix: /^(feat:)|(fix:)|(docs:)|(test:)/g,
 };
+const labels = {
+  wip: ['wip'],
+  working_in_progress: ['working in progress'],
+};
 
 module.exports = {
   danger, git, github,
@@ -42,5 +47,5 @@ module.exports = {
   issues,
   body, title, changed_files, user, additions, deletions, assignees,
   owner, repo, number,
-  isWIP, details, regex
+  isWIP, lastCommit, details, regex, labels
 }

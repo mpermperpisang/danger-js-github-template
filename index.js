@@ -50,7 +50,7 @@ module.exports = {
     } else {
       _.issues.listLabelsOnIssue(payloadLabelList).then((response) => {
         response.data.forEach((arr) => {
-          if (JSON.stringify(arr.name).includes(labels.working_in_progress)) {
+          if (JSON.stringify(arr.name).includes(_.labels.working_in_progress)) {
             _.issues.removeLabel(payloadLabelRemove);
           }
         });
@@ -67,6 +67,6 @@ module.exports = {
     }
   },
   prCommits() { // Force author to follow commit message format
-    if (!lastCommit.match(regex.commitPrefix)) warn(warnings.lastCommit(lastCommit));
+    if (!lastCommit.match(_.regex.commitPrefix)) warn(warnings.lastCommit(_.lastCommit));
   },
 }
