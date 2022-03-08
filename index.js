@@ -12,7 +12,7 @@ function checkPRChanges() {
 
 module.exports = {
   prTitle() { // Force author to follow title rule
-    const isTitleSHort = _.title.match(regex.shortTitle);
+    const isTitleSHort = _.title.match(_.regex.shortTitle);
 
     if (_.isWIP) warn(warnings.wip);
     if (!isTitleSHort) fail(failures.tooShortTitle);
