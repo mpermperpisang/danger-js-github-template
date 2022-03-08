@@ -11,7 +11,7 @@ SSH version - `npm i git+ssh://git@github.com:mpermperpisang/danger-js-github-te
 
 import {
   prTitle, prDesc, prAssignees, prLabels, prChangesCount, prCommits,
-} from 'danger-js-github-template ';
+} from 'danger-js-github-template';
 
 prTitle();
 prDesc();
