@@ -1,6 +1,4 @@
-const { details, isWIP, regex } = require( './general' );
-const { failures } = require( './message' );
-
+// Github
 const { git, github } = danger;
 const {
   modified_files,
@@ -14,6 +12,40 @@ const {
 } = pr;
 const { owner, repo, number } = thisPR;
 
+// Details
+const isWIP = titleUpper.includes(labels.wip.toString().toUpperCase());
+const details = {
+  exclude: [
+    'package-lock.json',
+    'dangerfile.js',
+  ],
+  max: {
+    changedFiles: 25,
+    changedCodes: 500,
+  },
+  min: {
+    desc: 100,
+  },
+};
+const regex = {
+  shortTitle: /\][ a-zA-Z0-9]{5,50}/,
+  commitPrefix: /^(feat:)|(fix:)|(docs:)|(test:)/g,
+};
+
+// Mesages
+const warnings = {
+  wip: 'PR is classified as Working in Progress',
+  lastCommit: 'Please check last commit message format.',
+};
+
+const failures = {
+  tooShortTitle: 'Please add more words on PR title.',
+  noLabel: 'Please add more tags on PR label.',
+  excludeFilesChanged: `Please DO NOT change ${details.exclude.join(' or ')}`,
+  tooMuchChanges: 'Big PR. Please break the PR changes.',
+};
+
+// Function declaration and calling
 function checkPRChanges() {
   const hasTooMuchFilesChanged = changed_files > details.max.changedFiles;
   const hasTooMuchCodesChanged = additions + deletions > details.max.changedCodes;

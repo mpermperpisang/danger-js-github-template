@@ -4,7 +4,6 @@
   "main": "index.js",
   "author": "mpermperpisang",
   "dependencies": {
-    "danger": "^10.7.1",
-    "lodash": "^4.17.21"
+    "danger": "^10.7.1"
   }
 }
