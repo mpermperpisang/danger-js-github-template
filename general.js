@@ -1,3 +1,5 @@
+const { title } = require( '.' );
+
 const titleUpper = title.toUpperCase();
 const isWIP = titleUpper.includes(labels.wip.toString().toUpperCase());
 const details = {
