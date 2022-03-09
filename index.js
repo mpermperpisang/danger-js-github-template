@@ -12,10 +12,10 @@ function checkPRChanges() {
 
 module.exports = {
   prTitle() { // Force author to follow title rule
-    const isTitleSHort = _.title.match(_.regex.shortTitle);
+    const isTitleShort = _.title.match(_.regex.shortTitle);
 
     if (_.isWIP) warn(warnings.wip);
-    if (!isTitleSHort) fail(failures.tooShortTitle);
+    if (!isTitleShort) fail(failures.tooShortTitle);
   },
   prDesc() { // Force author to follow description rule
     const hasMinDesc = _.body.length < _.details.min.desc;
@@ -24,7 +24,7 @@ module.exports = {
       warn(warnings.minDesc);
     }
   },
-  prAssignees() { // Force author to assign assignee
+  prAssignees() { // Force author to follow assignee rule
     const isEmptyAssignee = _.assignees.length === 0;
     const payload = {
       owner: _.owner, repo: _.repo, issue_number: _.number, assignees: _.user.login,
@@ -32,7 +32,7 @@ module.exports = {
 
     if (isEmptyAssignee) _.issues.addAssignees(payload);
   },
-  prLabels() { // Force author to add label
+  prLabels() { // Force author to follow label rule
     const isEmptyLabel = (_.isWIP && _.issue.labels.length === 1)
                           || (!_.isWIP && _.issue.labels.length === 0);
     const payloadLabelAdd = {
@@ -56,7 +56,7 @@ module.exports = {
     }
     if (isEmptyLabel) fail(failures.noLabel);
   },
-  prChangesCount() { // Force author to create small changes
+  prChangesCount() { // Force author to follow changes rule
     const isFileModified = _.details.exclude.filter((e) => _.modified_files.includes(e)).length > 0;
 
     if (isFileModified) {
@@ -65,7 +65,7 @@ module.exports = {
       checkPRChanges();
     }
   },
-  prCommits() { // Force author to follow commit message format
+  prCommits() { // Force author to follow commit rule
     if (!_.lastCommit.match(_.regex.commitPrefix)) warn(warnings.lastCommit(_.lastCommit));
   },
 }
