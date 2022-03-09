@@ -72,6 +72,8 @@ module.exports = {
     }
   },
   prCommits() { // Force author to follow commit rule
-    if (!_.lastCommit.match(_.regex.commitPrefix)) warn(warnings.lastCommit(_.lastCommit));
+    const hasCommitPrefix = _.lastCommit.match(_.regex.commitPrefix);
+
+    if (!hasCommitPrefix) warn(warnings.lastCommit(_.lastCommit));
   },
 }
