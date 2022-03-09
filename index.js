@@ -2,6 +2,21 @@ const _ = require( './general' );
 const { warnings, failures } = require( './message' );
 
 // Function declaration and calling
+function checkPRLabel() {
+  const payloadLabelList = { owner: _.owner, repo: _.repo, issue_number: _.number };
+  const payloadLabelRemove = {
+    owner: _.owner, repo: _.repo, issue_number: _.number, name: _.labels.working_in_progress,
+  };
+
+  _.issues.listLabelsOnIssue(payloadLabelList).then((response) => {
+    response.data.forEach((arr) => {
+      if (JSON.stringify(arr.name).includes(_.labels.working_in_progress)) {
+        _.issues.removeLabel(payloadLabelRemove);
+      }
+    });
+  });
+}
+
 function checkPRChanges() {
   const hasTooMuchFilesChanged = _.changed_files > _.details.max.changedFiles;
 
@@ -38,22 +53,13 @@ module.exports = {
     const payloadLabelAdd = {
       owner: _.owner, repo: _.repo, issue_number: _.number, labels: _.labels.working_in_progress,
     };
-    const payloadLabelList = { owner: _.owner, repo: _.repo, issue_number: _.number };
-    const payloadLabelRemove = {
-      owner: _.owner, repo: _.repo, issue_number: _.number, name: _.labels.working_in_progress,
-    };
 
     if (_.isWIP) {
       _.issues.addLabels(payloadLabelAdd);
     } else {
-      _.issues.listLabelsOnIssue(payloadLabelList).then((response) => {
-        response.data.forEach((arr) => {
-          if (JSON.stringify(arr.name).includes(_.labels.working_in_progress)) {
-            _.issues.removeLabel(payloadLabelRemove);
-          }
-        });
-      });
+      checkPRLabel();
     }
+
     if (isEmptyLabel) fail(failures.noLabel);
   },
   prChangesCount() { // Force author to follow changes rule
