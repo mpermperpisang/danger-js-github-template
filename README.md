@@ -33,4 +33,5 @@ In CI env - `yarn danger ci --failOnErrors`
 
 ### Contact
 Email - mpermperpisang@gmail.com<br/>
-Twitter - mpermperpisang
+Telegram - @mpermperpisang<br/>
+Twitter - @mpermperpisang
